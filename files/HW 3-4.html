@@ -1,0 +1,442 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 7.0.4.2 (Linux)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="00:00:00"/>
+	<style type="text/css">
+		@page { size: 8.27in 11.69in; margin: 0.79in }
+		p { margin-bottom: 0.1in; line-height: 115%; background: transparent }
+		pre { font-family: "Liberation Mono", monospace; font-size: 10pt; background: transparent }
+	</style>
+</head>
+<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><pre>install.packages(dplyr)
+library(dplyr)
+library(&quot;lubridate&quot;)
+library(&quot;glmnet&quot;)
+cons= read.csv(&quot;data.csv&quot;)
+cons$Consumption..MWh.&lt;-as.numeric(gsub(&quot;,&quot;,&quot;&quot;,cons$Consumption..MWh.,fixed=TRUE))
+
+cons$Date&lt;-as.Date(cons$Date,&quot;%d.%m.%Y&quot;)
+
+//Q.a.//
+  
+lag48&lt;-lag(cons,48)
+View(lag48)
+lag168&lt;-lag(cons,168)
+View(lag168)
+
+error.1 &lt;- ((lag168$Consumption..MWh.-cons$Consumption..MWh.)/lag168$Consumption..MWh.)
+error.2 &lt;- ((lag48$Consumption..MWh.-cons$Consumption..MWh.)/lag48$Consumption..MWh.)
+errors&lt;-mutate(cons,error.1,error.2)
+test.error&lt;-filter(errors,Date&gt;=as_date('2021-05-01'))
+test.error
+str(test.error)
+summary(test.error)
+
+// lag168 error mean = -0.015 % and lag48 error mean = -0.002 %//
+
+boxplot(test.error$error.1)
+  
+quantile(test.error$error.1, probs =c(0.1, 0.15, 0.5,0.75,0.9))
+  
+boxplot(test.error$error.2)
+quantile(test.error$error.2, probs =c(0.1, 0.15, 0.5,0.75,0.9))
+
+//Q.b.//
+  
+
+long&lt;- mutate(cons,lag168$Consumption..MWh.,lag48$Consumption..MWh.)
+colnames(long)[4]&lt;-&quot;lag_168&quot;
+colnames(long)[5]&lt;-&quot;lag_48&quot;
+
+train.long&lt;-filter(long,Date&lt;=&quot;2020-03-01&quot;, Date&gt;=&quot;2016-01-08&quot;)
+test.long&lt;-filter(long,Date &gt;&quot;2020-03-01&quot;,Date&lt;=&quot;2021-05-31&quot;)
+lm.model&lt;-lm(train.long$Consumption..MWh.~train.long$lag_48+ train.long$lag_168,data=train.long)
+prediction&lt;-predict(lm.model, data=test.long)
+MAPE&lt;-(abs((test.long$Consumption..MWh.-prediction)/test.long$Consumption..MWh.)*100)
+MAPE
+prediction
+summary(MAPE)
+
+//Q.C.//
+  
+train.long0&lt;-filter(train.long,Hour==&quot;00:00&quot;)
+train.long1&lt;-filter(train.long,Hour==&quot;01:00&quot;)
+train.long2&lt;-filter(train.long,Hour==&quot;02:00&quot;)
+train.long3&lt;-filter(train.long,Hour==&quot;03:00&quot;)
+train.long4&lt;-filter(train.long,Hour==&quot;04:00&quot;)
+train.long5&lt;-filter(train.long,Hour==&quot;05:00&quot;)
+train.long6&lt;-filter(train.long,Hour==&quot;06:00&quot;)
+train.long7&lt;-filter(train.long,Hour==&quot;07:00&quot;)
+train.long8&lt;-filter(train.long,Hour==&quot;08:00&quot;)
+train.long9&lt;-filter(train.long,Hour==&quot;09:00&quot;)
+train.long10&lt;-filter(train.long,Hour==&quot;10:00&quot;)
+train.long11&lt;-filter(train.long,Hour==&quot;11:00&quot;)
+train.long12&lt;-filter(train.long,Hour==&quot;12:00&quot;)
+train.long13&lt;-filter(train.long,Hour==&quot;13:00&quot;)
+train.long14&lt;-filter(train.long,Hour==&quot;14:00&quot;)
+train.long15&lt;-filter(train.long,Hour==&quot;15:00&quot;)
+train.long16&lt;-filter(train.long,Hour==&quot;16:00&quot;)
+train.long17&lt;-filter(train.long,Hour==&quot;17:00&quot;)
+train.long18&lt;-filter(train.long,Hour==&quot;18:00&quot;)
+train.long19&lt;-filter(train.long,Hour==&quot;19:00&quot;)
+train.long20&lt;-filter(train.long,Hour==&quot;20:00&quot;)
+train.long21&lt;-filter(train.long,Hour==&quot;21:00&quot;)
+train.long22&lt;-filter(train.long,Hour==&quot;22:00&quot;)
+train.long23&lt;-filter(train.long,Hour==&quot;23:00&quot;)
+
+test.long0&lt;-filter(test.long   ,Hour==&quot;00:00&quot;)
+test.long1&lt;-filter(test.long   ,Hour==&quot;01:00&quot;)
+test.long2&lt;-filter(test.long   ,Hour==&quot;02:00&quot;)
+test.long3&lt;-filter(test.long   ,Hour==&quot;03:00&quot;)
+test.long4&lt;-filter(test.long   ,Hour==&quot;04:00&quot;)
+test.long5&lt;-filter(test.long   ,Hour==&quot;05:00&quot;)
+test.long6&lt;-filter(test.long   ,Hour==&quot;06:00&quot;)
+test.long7&lt;-filter(test.long   ,Hour==&quot;07:00&quot;)
+test.long8&lt;-filter(test.long   ,Hour==&quot;08:00&quot;)
+test.long9&lt;-filter(test.long   ,Hour==&quot;09:00&quot;)
+test.long10&lt;-filter(test.long   ,Hour==&quot;10:00&quot;)
+test.long11&lt;-filter(test.long   ,Hour==&quot;11:00&quot;)
+test.long12&lt;-filter(test.long   ,Hour==&quot;12:00&quot;)
+test.long13&lt;-filter(test.long   ,Hour==&quot;13:00&quot;)
+test.long14&lt;-filter(test.long   ,Hour==&quot;14:00&quot;)
+test.long15&lt;-filter(test.long   ,Hour==&quot;15:00&quot;)
+test.long16&lt;-filter(test.long   ,Hour==&quot;16:00&quot;)
+test.long17&lt;-filter(test.long   ,Hour==&quot;17:00&quot;)
+test.long18&lt;-filter(test.long   ,Hour==&quot;18:00&quot;)
+test.long19&lt;-filter(test.long   ,Hour==&quot;19:00&quot;)
+test.long20&lt;-filter(test.long   ,Hour==&quot;20:00&quot;)
+test.long21&lt;-filter(test.long   ,Hour==&quot;21:00&quot;)
+test.long22&lt;-filter(test.long   ,Hour==&quot;22:00&quot;)
+test.long23&lt;-filter(test.long   ,Hour==&quot;23:00&quot;)
+
+lm.b0&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long0)
+lm.b1&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long1)
+lm.b2&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long2)
+lm.b3&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long3)
+lm.b4&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long4)
+lm.b5&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long5)
+lm.b6&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long6)
+lm.b7&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long7)
+lm.b8&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long8)
+lm.b9&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long9)
+lm.b10&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long10)
+lm.b11&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long11)
+lm.b12&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long12)
+lm.b13&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long13)
+lm.b14&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long14)
+lm.b15&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long15)
+lm.b16&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long16)
+lm.b17&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long17)
+lm.b18&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long18)
+lm.b19&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long19)
+lm.b20&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long20)
+lm.b21&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long21)
+lm.b22&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long22)
+lm.b23&lt;-lm(Consumption..MWh. ~  lag_48+ lag_168 , data= train.long23)
+
+pred.b0&lt;- predict(lm.b0, data= test.long0)
+pred.b1&lt;- predict(lm.b1, data= test.long1)
+pred.b2&lt;- predict(lm.b2, data= test.long2)
+pred.b3&lt;- predict(lm.b3, data= test.long3)
+pred.b4&lt;- predict(lm.b4, data= test.long4)
+pred.b5&lt;- predict(lm.b5, data= test.long5)
+pred.b6&lt;- predict(lm.b6, data= test.long6)
+pred.b7&lt;- predict(lm.b7, data= test.long7)
+pred.b8&lt;- predict(lm.b8, data= test.long8)
+pred.b9&lt;- predict(lm.b9, data= test.long9)
+pred.b10&lt;- predict(lm.b10, data= test.long10)
+pred.b11&lt;- predict(lm.b11, data= test.long11)
+pred.b12&lt;- predict(lm.b12, data= test.long12)
+pred.b13&lt;- predict(lm.b13, data= test.long13)
+pred.b14&lt;- predict(lm.b14, data= test.long14)
+pred.b15&lt;- predict(lm.b15, data= test.long15)
+pred.b16&lt;- predict(lm.b16, data= test.long16)
+pred.b17&lt;- predict(lm.b17, data= test.long17)
+pred.b18&lt;- predict(lm.b18, data= test.long18)
+pred.b19&lt;- predict(lm.b19, data= test.long19)
+pred.b20&lt;- predict(lm.b20, data= test.long20)
+pred.b21&lt;- predict(lm.b21, data= test.long21)
+pred.b22&lt;- predict(lm.b22, data= test.long22)
+pred.b23&lt;- predict(lm.b23, data= test.long23)
+
+abs((test.long0$Consumption..MWh.- pred.b0)/test.long0)
+test.long0$Consumption..MWh.-pred.b0
+test.long$Consumption..MWh.
+(test.long0$Consumption..MWh.- pred.b0)/test.long0
+abs(test.long0$Consumption..MWh.- pred.b0)
+mape.b0&lt;-abs(test.long0$Consumption..MWh.- pred.b0)/100
+mape.b1&lt;-abs(test.long1$Consumption..MWh.- pred.b1)/100
+mape.b2&lt;-abs(test.long2$Consumption..MWh.- pred.b2)/100
+mape.b3&lt;-abs(test.long3$Consumption..MWh.- pred.b3)/100
+mape.b4&lt;-abs(test.long4$Consumption..MWh.- pred.b4)/100
+mape.b5&lt;-abs(test.long5$Consumption..MWh.- pred.b5)/100
+mape.b6&lt;-abs(test.long6$Consumption..MWh.- pred.b6)/100
+mape.b7&lt;-abs(test.long7$Consumption..MWh.- pred.b7)/100
+mape.b8&lt;-abs(test.long8$Consumption..MWh.- pred.b8)/100
+mape.b9&lt;-abs(test.long9$Consumption..MWh.- pred.b9)/100
+mape.b10&lt;-abs(test.long10$Consumption..MWh.- pred.b10)/100
+mape.b11&lt;-abs(test.long11$Consumption..MWh.- pred.b11)/100
+mape.b12&lt;-abs(test.long12$Consumption..MWh.- pred.b12)/100
+mape.b13&lt;-abs(test.long13$Consumption..MWh.- pred.b13)/100
+mape.b14&lt;-abs(test.long0$Consumption..MWh.- pred.b14)/100
+mape.b15&lt;-abs(test.long15$Consumption..MWh.- pred.b15)/100
+mape.b16&lt;-abs(test.long16$Consumption..MWh.- pred.b16)/100
+mape.b17&lt;-abs(test.long17$Consumption..MWh.- pred.b17)/100
+mape.b18&lt;-abs(test.long18$Consumption..MWh.- pred.b18)/100
+mape.b19&lt;-abs(test.long19$Consumption..MWh.- pred.b19)/100
+mape.b20&lt;-abs(test.long20$Consumption..MWh.- pred.b20)/100
+mape.b21&lt;-abs(test.long21$Consumption..MWh.- pred.b21)/100
+mape.b23&lt;-abs(test.long23$Consumption..MWh.- pred.b23)/100
+mape.b22&lt;-abs(test.long22$Consumption..MWh.- pred.b22)/100
+colnames(train.long1)[4]&lt;-&quot;lag_168_1&quot;
+
+colnames(train.long1)[5]&lt;-&quot;lag_48_1&quot;
+
+colnames(train.long2)[4]&lt;-&quot;lag_168_2&quot;
+
+colnames(train.long2)[5]&lt;-&quot;lag_48_2&quot;
+
+colnames(train.long4)[4]&lt;-&quot;lag_168_4&quot;
+
+colnames(train.long4)[5]&lt;-&quot;lag_48_4&quot;
+
+colnames(train.long5)[4]&lt;-&quot;lag_168_5&quot;
+
+colnames(train.long5)[5]&lt;-&quot;lag_48_5&quot;
+
+colnames(train.long6)[4]&lt;-&quot;lag_168_6&quot;
+
+colnames(train.long6)[5]&lt;-&quot;lag_48_6&quot;
+
+colnames(train.long7)[4]&lt;-&quot;lag_168_7&quot;
+
+colnames(train.long7)[5]&lt;-&quot;lag_48_7&quot;
+
+colnames(train.long8)[4]&lt;-&quot;lag_168_8&quot;
+
+colnames(train.long8)[5]&lt;-&quot;lag_48_8&quot;
+
+colnames(train.long9)[4]&lt;-&quot;lag_168_9&quot;
+
+colnames(train.long9)[5]&lt;-&quot;lag_48_9&quot;
+
+colnames(train.long10)[4]&lt;-&quot;lag_168_10&quot;
+
+colnames(train.long10)[5]&lt;-&quot;lag_48_10&quot;
+
+colnames(train.long11)[4]&lt;-&quot;lag_168_11&quot;
+
+colnames(train.long11)[5]&lt;-&quot;lag_48_11&quot;
+
+colnames(train.long12)[4]&lt;-&quot;lag_168_12&quot;
+
+colnames(train.long12)[5]&lt;-&quot;lag_48_12&quot;
+
+colnames(train.long13)[4]&lt;-&quot;lag_168_13&quot;
+
+colnames(train.long13)[5]&lt;-&quot;lag_48_13&quot;
+colnames(train.long14)[4]&lt;-&quot;lag_168_14&quot;
+
+colnames(train.long14)[5]&lt;-&quot;lag_48_14&quot;
+
+colnames(train.long15)[4]&lt;-&quot;lag_168_15&quot;
+
+colnames(train.long15)[5]&lt;-&quot;lag_48_15&quot;
+
+colnames(train.long16)[4]&lt;-&quot;lag_168_16&quot;
+
+colnames(train.long16)[5]&lt;-&quot;lag_48_16&quot;
+
+colnames(train.long17)[4]&lt;-&quot;lag_168_17&quot;
+
+colnames(train.long17)[5]&lt;-&quot;lag_48_17&quot;
+
+colnames(train.long18)[4]&lt;-&quot;lag_168_18&quot;
+
+colnames(train.long18)[5]&lt;-&quot;lag_48_18&quot;
+
+colnames(train.long19)[4]&lt;-&quot;lag_168_19&quot;
+
+colnames(train.long19)[5]&lt;-&quot;lag_48_19&quot;
+
+colnames(train.long20)[4]&lt;-&quot;lag_168_20&quot;
+
+colnames(train.long20)[5]&lt;-&quot;lag_48_20&quot;
+
+colnames(train.long21)[4]&lt;-&quot;lag_168_21&quot;
+
+colnames(train.long21)[5]&lt;-&quot;lag_48_21&quot;
+
+colnames(train.long22)[4]&lt;-&quot;lag_168_22&quot;
+
+colnames(train.long22)[5]&lt;-&quot;lag_48_22&quot;
+
+colnames(train.long23)[4]&lt;-&quot;lag_168_23&quot;
+
+colnames(train.long23)[5]&lt;-&quot;lag_48_23&quot;
+
+wide0&lt;-train.long0[c(1,4,5)]
+wide1&lt;-train.long1[c(4,5)]
+
+wide2&lt;-train.long2[c(4,5)]
+
+wide5&lt;-train.long5[c(4,5)]
+wide6&lt;-train.long6[c(4,5)]
+wide7&lt;-train.long7[c(4,5)]
+wide8&lt;-train.long8[c(4,5)]
+wide9&lt;-train.long9[c(4,5)]
+wide10&lt;-train.long10[c(4,5)]
+wide11&lt;-train.long11[c(4,5)]
+wide12&lt;-train.long12[c(4,5)]
+wide13&lt;-train.long13[c(4,5)]
+wide14&lt;-train.long14[c(4,5)]
+wide15&lt;-train.long15[c(4,5)]
+wide16&lt;-train.long16[c(4,5)]
+wide17&lt;-train.long17[c(4,5)]
+wide18&lt;-train.long18[c(4,5)]
+wide19&lt;-train.long19[c(4,5)]
+wide20&lt;-train.long20[c(4,5)]
+wide21&lt;-train.long21[c(4,5)]
+wide22&lt;-train.long22[c(4,5)]
+wide23&lt;-train.long23[c(4,5)]
+
+wide.deneme&lt;-mutate(wide0,wide1,wide2,wide5,wide6,wide7,wide8,wide9,wide10,wide11,wide12,wide13,wide14,wide15,wide16,wide17,wide18,wide19,wide20,wide21,wide22,wide23)
+
+target&lt;-filter(train.long,Hour==&quot;18:00&quot;)
+target_18&lt;-target[c(3)]
+wide&lt;-mutate(wide.deneme,target_18)
+
+glm.wide&lt;-cv.glmnet(data.matrix(wide[,-c(1,46)]),wide$Consumption..MWh.,family=&quot;gaussian&quot;)
+
+colnames(test.long1)[4]&lt;-&quot;lag_168_1&quot;
+
+colnames(test.long1)[5]&lt;-&quot;lag_48_1&quot;
+
+colnames(test.long2)[4]&lt;-&quot;lag_168_2&quot;
+
+colnames(test.long2)[5]&lt;-&quot;lag_48_2&quot;
+
+colnames(test.long4)[4]&lt;-&quot;lag_168_4&quot;
+
+colnames(test.long4)[5]&lt;-&quot;lag_48_4&quot;
+
+colnames(test.long5)[4]&lt;-&quot;lag_168_5&quot;
+
+colnames(test.long5)[5]&lt;-&quot;lag_48_5&quot;
+
+colnames(test.long6)[4]&lt;-&quot;lag_168_6&quot;
+
+colnames(test.long6)[5]&lt;-&quot;lag_48_6&quot;
+
+colnames(test.long7)[4]&lt;-&quot;lag_168_7&quot;
+
+colnames(test.long7)[5]&lt;-&quot;lag_48_7&quot;
+
+colnames(test.long8)[4]&lt;-&quot;lag_168_8&quot;
+
+colnames(test.long8)[5]&lt;-&quot;lag_48_8&quot;
+
+colnames(test.long9)[4]&lt;-&quot;lag_168_9&quot;
+
+colnames(test.long9)[5]&lt;-&quot;lag_48_9&quot;
+
+colnames(test.long10)[4]&lt;-&quot;lag_168_10&quot;
+
+colnames(test.long10)[5]&lt;-&quot;lag_48_10&quot;
+
+colnames(test.long11)[4]&lt;-&quot;lag_168_11&quot;
+
+colnames(test.long11)[5]&lt;-&quot;lag_48_11&quot;
+
+colnames(test.long12)[4]&lt;-&quot;lag_168_12&quot;
+
+colnames(test.long12)[5]&lt;-&quot;lag_48_12&quot;
+
+colnames(test.long13)[4]&lt;-&quot;lag_168_13&quot;
+
+colnames(test.long13)[5]&lt;-&quot;lag_48_13&quot;
+colnames(test.long14)[4]&lt;-&quot;lag_168_14&quot;
+
+colnames(test.long14)[5]&lt;-&quot;lag_48_14&quot;
+
+colnames(test.long15)[4]&lt;-&quot;lag_168_15&quot;
+
+colnames(test.long15)[5]&lt;-&quot;lag_48_15&quot;
+
+colnames(test.long16)[4]&lt;-&quot;lag_168_16&quot;
+
+colnames(test.long16)[5]&lt;-&quot;lag_48_16&quot;
+
+colnames(test.long17)[4]&lt;-&quot;lag_168_17&quot;
+
+colnames(test.long17)[5]&lt;-&quot;lag_48_17&quot;
+
+colnames(test.long18)[4]&lt;-&quot;lag_168_18&quot;
+
+colnames(test.long18)[5]&lt;-&quot;lag_48_18&quot;
+
+colnames(test.long19)[4]&lt;-&quot;lag_168_19&quot;
+
+colnames(test.long19)[5]&lt;-&quot;lag_48_19&quot;
+
+colnames(test.long20)[4]&lt;-&quot;lag_168_20&quot;
+
+colnames(test.long20)[5]&lt;-&quot;lag_48_20&quot;
+
+colnames(test.long21)[4]&lt;-&quot;lag_168_21&quot;
+
+colnames(test.long21)[5]&lt;-&quot;lag_48_21&quot;
+
+colnames(test.long22)[4]&lt;-&quot;lag_168_22&quot;
+
+colnames(test.long22)[5]&lt;-&quot;lag_48_22&quot;
+
+colnames(test.long23)[4]&lt;-&quot;lag_168_23&quot;
+
+colnames(test.long23)[5]&lt;-&quot;lag_48_23&quot;
+
+wide.test0&lt;-test.long0[c(1,4,5)]
+
+wide.test1&lt;-test.long1[c(4,5)]
+
+wide.test2&lt;-test.long2[c(4,5)]
+
+wide.test5&lt;-test.long5[c(4,5)]
+wide.test6&lt;-test.long6[c(4,5)]
+wide.test7&lt;-test.long7[c(4,5)]
+wide.test8&lt;-test.long8[c(4,5)]
+wide.test9&lt;-test.long9[c(4,5)]
+wide.test10&lt;-test.long10[c(4,5)]
+wide.test11&lt;-test.long11[c(4,5)]
+wide.test12&lt;-test.long12[c(4,5)]
+wide.test13&lt;-test.long13[c(4,5)]
+wide.test14&lt;-test.long14[c(4,5)]
+wide.test15&lt;-test.long15[c(4,5)]
+wide.test16&lt;-test.long16[c(4,5)]
+wide.test17&lt;-test.long17[c(4,5)]
+wide.test18&lt;-test.long18[c(4,5)]
+wide.test19&lt;-test.long19[c(4,5)]
+wide.test20&lt;-test.long20[c(4,5)]
+wide.test21&lt;-test.long21[c(4,5)]
+wide.test22&lt;-test.long22[c(4,5)]
+wide.test23&lt;-test.long23[c(4,5)]
+
+wide.test &lt;-mutate(wide.test0,wide.test1,wide.test2,wide.test5,wide.test6,wide.test7,wide.test8,wide.test9,wide.test10,wide.test11,wide.test12,wide.test13,wide.test14,wide.test15,wide.test16,wide.test17,wide.test18,wide.test19,wide.test20,wide.test21,wide.test22,wide.test23)
+
+target.test&lt;-filter(test.long,Hour==&quot;18:00&quot;)
+target.test_18&lt;-target.test[c(3)]
+wide_test&lt;-mutate(wide.test,target.test_18)
+
+
+predict.glm= predict (glm.wide,data.matrix(wide_test[,-c(1)]),s='lambda.min')
+
+abs(((wide_test$Consumption..MWh.-predict.glm)/wide_test$Consumption..MWh.)*100)
+coef(glm.wide, s='lambda.1se')
+
+</pre>
+</body>
+</html>
