@@ -2,7 +2,7 @@
 
 ## Homework 3&4 (July 4)
 
-[Here](files/HW 3-4.html) is my Homework 3&4.
+[Here](files/HW-3_4.html) is my Homework 3&4.
 
 
 ## Project (July 07)
